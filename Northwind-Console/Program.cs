@@ -45,7 +45,10 @@ namespace NorthwindConsole
                         Console.WriteLine("Enter the Category Description:");
                         category.Description = Console.ReadLine();
 
-                        ValidationContext context = new ValidationContext(category, null, null);
+                        var db = new NorthwindContext();
+                        db.Categories.Add(category);
+                        db.SaveChanges();
+                        /*ValidationContext context = new ValidationContext(category, null, null);
                         List<ValidationResult> results = new List<ValidationResult>();
 
                         var isValid = Validator.TryValidateObject(category, context, results, true);
@@ -71,7 +74,7 @@ namespace NorthwindConsole
                             {
                                 logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
                             }
-                        }
+                        }*/
                     } else if (choice == "3")
                     {
                         var db = new NorthwindContext();
