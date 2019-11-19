@@ -154,6 +154,17 @@ namespace NorthwindConsole
                 Console.WriteLine("3) Display discontinued products.");
                 response = Console.ReadLine();
             } while (response != "1" && response != "2" && response != "3");
+            switch (response) {
+                case "1":
+
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+
+                    break;
+            }
         }
     }
 }
