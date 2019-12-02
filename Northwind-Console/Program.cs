@@ -5,6 +5,7 @@ using System.Linq;
 using NLog;
 using NorthwindConsole.Models;
 
+
 namespace NorthwindConsole
 {
     class MainClass
@@ -34,7 +35,7 @@ namespace NorthwindConsole
                         Console.WriteLine($"{query.Count()} records returned");
                         foreach (var item in query)
                         {
-                            Console.WriteLine($"{item.CategoryName} - {item.Description}");
+                            Console.WriteLine($"{item.CategoryId}) {item.CategoryName} - {item.Description}");
                         }
                     } 
                     else if (choice == "2")
