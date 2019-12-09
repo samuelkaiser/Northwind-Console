@@ -31,9 +31,9 @@ namespace NorthwindConsole
                     Console.WriteLine("5) Display all products.");
                     Console.WriteLine("6) Display product by ID");
                     Console.WriteLine("7) Add new product");
-                    Console.WriteLine("8)");
-                    Console.WriteLine("9)");
-                    Console.WriteLine("10)");
+                    Console.WriteLine("8) Edit product by ID");
+                    Console.WriteLine("9) Delete category by ID (and all containing products)");
+                    Console.WriteLine("10) Delete a product by ID");
                     Console.WriteLine("\"q\" to quit");
                     choice = Console.ReadLine();
                     Console.Clear();
@@ -75,99 +75,126 @@ namespace NorthwindConsole
 
         public static void addNewProduct() {
             string response;
-            int counter = 0;
+            
+            // do
+            // {
+            Product product = new Product();
+
+            do {
+                Console.WriteLine("Enter Product Name:");
+                response = Console.ReadLine();
+
+                // set a minimum character length on product names
+                if (response.Length < 5)
+                {
+                    Console.WriteLine("Product names must be atleast 5 characters. Try again.");
+                }
+                else {
+                    product.ProductName = response;
+                }
+
+            } while (response.Length < 5);
+
+            product.ProductName = Console.ReadLine();
+
             do
             {
-                Product product = new Product();
-                Console.WriteLine("Enter Product Name:");
-                product.ProductName = Console.ReadLine();
+                Console.WriteLine("Enter unit price.");
+                response = Console.ReadLine();
+                if (!((Convert.ToDecimal(response) % 1) > 0)) {
+                    Console.WriteLine("Please enter a valid decimal");
+                }
+            } while (!((Convert.ToDecimal(response) % 1) > 0));
 
-                do
+            // reusable "short" data type for various upcoming checks
+            short numericCheck;
+            do
+            {
+                // figuring out the units on hand using a short data type
+                short stock = 0;
+                Console.WriteLine("Enter units on hand");
+                response = Console.ReadLine();
+                if (!(short.TryParse(response, out numericCheck)))
                 {
-                    Console.WriteLine("Enter unit price.");
-                    response = Console.ReadLine();
-                    if (!((Convert.ToDecimal(response) % 1) > 0)) {
-                        Console.WriteLine("Please enter a valid decimal");
-                    }
-                } while (!((Convert.ToDecimal(response) % 1) > 0));
+                    Console.WriteLine("Please enter a valid number.");
+                }
+                else {
+                    short.TryParse(response, out stock);
+                    product.UnitsInStock = stock;
+                }
+            } while (!(short.TryParse(response, out numericCheck)));
 
-                // reusable "short" data type for various upcoming checks
-                short numericCheck;
-                do
+            do
+            {
+                // figuring out the units on hand using a short data type
+                short onOrder = 0;
+
+                Console.WriteLine("Enter units on order");
+                response = Console.ReadLine();
+
+                if (!(short.TryParse(response, out numericCheck)))
                 {
-                    // figuring out the units on hand using a short data type
-                    short stock = 0;
-                    Console.WriteLine("Enter units on hand");
-                    response = Console.ReadLine();
-                    if (!(short.TryParse(response, out numericCheck)))
-                    {
-                        Console.WriteLine("Please enter a valid number.");
-                    }
-                    else {
-                        short.TryParse(response, out stock);
-                        product.UnitsInStock = stock;
-                    }
-                } while (!(short.TryParse(response, out numericCheck)));
-
-                do
+                    Console.WriteLine("Please enter a valid number.");
+                }
+                else
                 {
-                    // figuring out the units on hand using a short data type
-                    short onOrder = 0;
+                    short.TryParse(response, out onOrder);
+                    product.UnitsOnOrder = onOrder;
+                }
+            } while (!(short.TryParse(response, out numericCheck)));
 
-                    Console.WriteLine("Enter units on order");
-                    response = Console.ReadLine();
+            do
+            {
+                // figuring out the reorder level (don't actually know what it is just know it's a smallint
+                short reorderLevel = 0;
 
-                    if (!(short.TryParse(response, out numericCheck)))
-                    {
-                        Console.WriteLine("Please enter a valid number.");
-                    }
-                    else
-                    {
-                        short.TryParse(response, out onOrder);
-                        product.UnitsOnOrder = onOrder;
-                    }
-                } while (!(short.TryParse(response, out numericCheck)));
+                Console.WriteLine("Please enter Reorder level.");
+                response = Console.ReadLine();
 
-                do
+                if (!(short.TryParse(response, out numericCheck)))
                 {
-                    // figuring out the reorder level (don't actually know what it is just know it's a smallint
-                    short reorderLevel = 0;
+                    Console.WriteLine("Please enter a valid number.");
+                }
+                else
+                {
+                    short.TryParse(response, out reorderLevel);
+                    product.UnitsOnOrder = reorderLevel;
+                }
+            } while (!(short.TryParse(response, out numericCheck)));
 
-                    Console.WriteLine("Please enter Reorder level.");
-                    response = Console.ReadLine();
+            do {
+                Console.WriteLine("Is this product discontinued? y/n");
+                response = Console.ReadLine();
+            } while (response.ToLower() != "y" && response.ToLower() != "n");
 
-                    if (!(short.TryParse(response, out numericCheck)))
-                    {
-                        Console.WriteLine("Please enter a valid number.");
-                    }
-                    else
-                    {
-                        short.TryParse(response, out reorderLevel);
-                        product.UnitsOnOrder = reorderLevel;
-                    }
-                } while (!(short.TryParse(response, out numericCheck)));
+            int categoryID;
+            do {
+                Console.WriteLine("Please enter a category ID:");
+                response = Console.ReadLine();
+                if (int.TryParse(response, out categoryID)) {
 
-                do {
-                    Console.WriteLine("Is this product discontinued? y/n");
-                    response = Console.ReadLine();
-                } while (response.ToLower() != "y" && response.ToLower() != "n");
+                }
+            }while(!(int.TryParse(response, out categoryID)));
 
-                int categoryID;
-                do {
-                    Console.WriteLine("Please enter a category ID:");
-                    response = Console.ReadLine();
-                    if (int.TryParse(response, out categoryID)) {
+            var db = new NorthwindContext();
+            db.Products.Add(product);
+            db.SaveChanges();
+                /**
+                 * public int ProductID { get; set; } check
+        public string ProductName { get; set; } check
+        public string QuantityPerUnit { get; set; }
+        public decimal? UnitPrice { get; set; } check
+        public Int16? UnitsInStock { get; set; }
+        public Int16? UnitsOnOrder { get; set; }
+        public Int16? ReorderLevel { get; set; } check
+        public bool Discontinued { get; set; } check
 
-                    }
-                }while(!(int.TryParse(response, out categoryID)));
-
-                var db = new NorthwindContext();
-                db.Products.Add(product);
-                db.SaveChanges();
-
+        public int? CategoryId { get; set; }
+        public int? SupplierId { get; set; }
+            */
                 // logger.Info($"User has added a category called {category.CategoryName}.");
 
-                Console.WriteLine("Add additional category? (y/n)");
+                /*Console.WriteLine("Add additional category? (y/n)");
                 response = Console.ReadLine();
                 counter++;
                 // check if they'd like to add additional categories
@@ -175,10 +202,10 @@ namespace NorthwindConsole
                 {
                     Console.WriteLine("Please enter a valid response.  Add additional category? (y/n)");
                     response = Console.ReadLine();
-                } while (response.ToLower() != "y" && response.ToLower() != "n");
+                } while (response.ToLower() != "y" && response.ToLower() != "n");*/
 
 
-            } while (response.ToLower() != "n");
+          //  } while (response.ToLower() != "n");
 
             // logger.Info($"User has added {counter} total categories.");
         }
