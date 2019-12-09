@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-// using NLog;
+using NLog;
 using System.Text;
 using System.Threading.Tasks;
 using NorthwindConsole.Models;
@@ -11,13 +11,13 @@ namespace NorthwindConsole
 {
     class MainClass
     {
-        //private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
 
         public static object NLog { get; private set; }
 
         public static void Main(string[] args)
         {
-            // logger.Info("Program started");
+            logger.Info("Program started");
             try
             {
                 string choice;
@@ -38,7 +38,7 @@ namespace NorthwindConsole
                     choice = Console.ReadLine();
                     Console.Clear();
 
-                    // logger.Info($"Option {choice} selected");
+                    logger.Info($"Option {choice} selected");
 
                     switch (choice) {
                         case "1": displayAllCategories(); break; // name and description
@@ -61,9 +61,9 @@ namespace NorthwindConsole
             }
             catch (Exception ex)
             {
-               // logger.Error(ex.Message);
+               logger.Error(ex.Message);
             }
-            // logger.Info("Program ended");
+            logger.Info("Program ended");
         }
         public static void displayProductById() {
 
@@ -213,6 +213,7 @@ namespace NorthwindConsole
         public static void deleteCategoryAndAllChildProducts() {
 
         }
+
         public static void displayAllCategories() {
             var db = new NorthwindContext();
             var query = db.Categories.OrderBy(p => p.CategoryName);
@@ -222,7 +223,7 @@ namespace NorthwindConsole
             {
                 Console.WriteLine($"{item.CategoryId}) {item.CategoryName} - {item.Description}");
             }
-            // logger.Info($"User has displayed all categories.");
+            logger.Info($"User has displayed all categories.");
         }
 
         public static void addNewCategory() {
@@ -241,7 +242,7 @@ namespace NorthwindConsole
                 db.Categories.Add(category);
                 db.SaveChanges();
 
-                // logger.Info($"User has added a category called {category.CategoryName}.");
+                logger.Info($"User has added a category called {category.CategoryName}.");
 
                 Console.WriteLine("Add additional category? (y/n)");
                 response = Console.ReadLine();
@@ -256,7 +257,7 @@ namespace NorthwindConsole
                
             } while (response.ToLower() != "n");
 
-            // logger.Info($"User has added {counter} total categories.");
+            logger.Info($"User has added {counter} total categories.");
         }
 
         public static void displayCategoryAndProducts() {
@@ -270,7 +271,7 @@ namespace NorthwindConsole
             }
             int id = int.Parse(Console.ReadLine());
             Console.Clear();
-            // logger.Info($"CategoryId {id} selected");
+            logger.Info($"CategoryId {id} selected");
             Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
 
             Console.WriteLine($"{category.CategoryName} - {category.Description}");
@@ -304,9 +305,9 @@ namespace NorthwindConsole
                 Console.WriteLine("1) Display all products.");
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("2) Display active products."); // differentiating active
+                Console.WriteLine("2) Display active products."); // differentiating active products with green
 
-                Console.ForegroundColor = ConsoleColor.Red; // differentiating discontinued
+                Console.ForegroundColor = ConsoleColor.Red; // differentiating discontinued products with red
                 Console.WriteLine("3) Display discontinued products.");
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
