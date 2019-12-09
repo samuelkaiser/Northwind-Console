@@ -50,7 +50,7 @@ namespace NorthwindConsole
                         case "7": addNewProduct(); break; // as it sounds
                         case "8": editExistingProductById(); break; // as it sounds
                         case "9": deleteCategoryAndAllChildProducts(); break; // as it sounds
-                        case "10": break;
+                        case "10": displayProductById();  break;
                         case "q": Console.WriteLine("thank you come again..."); break; // quietly mumble it back
                         case "Q": Console.WriteLine("THANK YOU COME AGAIN!!!"); break; // YELL IT BACK AT THEM
                         default: Console.WriteLine("Please choose a valid option."); break;
@@ -66,6 +66,42 @@ namespace NorthwindConsole
             logger.Info("Program ended");
         }
         public static void displayProductById() {
+            string response;
+            int numericCheck = 0;
+            var db = new NorthwindContext();
+
+            do {
+                Console.WriteLine("Please enter the product's ID");
+                response = Console.ReadLine();
+
+                if (!(int.TryParse(response, out numericCheck)))
+                {
+                    Console.WriteLine("Please enter a valid product ID number.");
+                }
+                else {
+                    int.TryParse(response, out numericCheck);
+                }
+            } while (!(int.TryParse(response, out numericCheck)));
+
+            var query = db.Products.Where(p => p.ProductID == numericCheck);
+
+            foreach (var item in query) {
+                Console.WriteLine("Product name: " + item.ProductName);
+                Console.WriteLine("Unit price: " + item.UnitPrice);
+                Console.WriteLine("Quantity per Unit" + item.QuantityPerUnit);
+                Console.WriteLine("Quantity on hand: " + item.UnitsInStock);
+                Console.WriteLine("Units on order: " + item.UnitsOnOrder);
+                Console.WriteLine("Reorder level: " + item.ReorderLevel);
+
+                if (item.Discontinued)
+                {
+                    Console.WriteLine("Is product active: No");
+                }
+                else {
+                    Console.WriteLine("Is product active: Yes");
+                }
+                Console.WriteLine();
+            }
 
         }
 
@@ -112,8 +148,11 @@ namespace NorthwindConsole
             {
                 // figuring out the units on hand using a short data type
                 short stock = 0;
+
                 Console.WriteLine("Enter units on hand");
+
                 response = Console.ReadLine();
+
                 if (!(short.TryParse(response, out numericCheck)))
                 {
                     Console.WriteLine("Please enter a valid number.");
@@ -130,6 +169,7 @@ namespace NorthwindConsole
                 short onOrder = 0;
 
                 Console.WriteLine("Enter units on order");
+
                 response = Console.ReadLine();
 
                 if (!(short.TryParse(response, out numericCheck)))
@@ -171,26 +211,28 @@ namespace NorthwindConsole
             do {
                 Console.WriteLine("Please enter a category ID:");
                 response = Console.ReadLine();
+
                 if (int.TryParse(response, out categoryID)) {
 
                 }
             }while(!(int.TryParse(response, out categoryID)));
 
             var db = new NorthwindContext();
+
             db.Products.Add(product);
             db.SaveChanges();
                 /**
                  * public int ProductID { get; set; } check
-        public string ProductName { get; set; } check
-        public string QuantityPerUnit { get; set; }
-        public decimal? UnitPrice { get; set; } check
-        public Int16? UnitsInStock { get; set; }
-        public Int16? UnitsOnOrder { get; set; }
-        public Int16? ReorderLevel { get; set; } check
-        public bool Discontinued { get; set; } check
+                public string ProductName { get; set; } check
+                public string QuantityPerUnit { get; set; }
+                public decimal? UnitPrice { get; set; } check
+                public Int16? UnitsInStock { get; set; }
+                public Int16? UnitsOnOrder { get; set; }
+                public Int16? ReorderLevel { get; set; } check
+                public bool Discontinued { get; set; } check
 
-        public int? CategoryId { get; set; }
-        public int? SupplierId { get; set; }
+                public int? CategoryId { get; set; }
+                public int? SupplierId { get; set; }
             */
                 // logger.Info($"User has added a category called {category.CategoryName}.");
 
@@ -219,10 +261,12 @@ namespace NorthwindConsole
             var query = db.Categories.OrderBy(p => p.CategoryName);
 
             Console.WriteLine($"{query.Count()} records returned");
+
             foreach (var item in query)
             {
                 Console.WriteLine($"{item.CategoryId}) {item.CategoryName} - {item.Description}");
             }
+
             logger.Info($"User has displayed all categories.");
         }
 
@@ -231,7 +275,6 @@ namespace NorthwindConsole
             int counter = 0;
             do
             {
-                
                 Category category = new Category();
                 Console.WriteLine("Enter Category Name:");
                 category.CategoryName = Console.ReadLine();
@@ -271,7 +314,9 @@ namespace NorthwindConsole
             }
             int id = int.Parse(Console.ReadLine());
             Console.Clear();
+
             logger.Info($"CategoryId {id} selected");
+
             Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
 
             Console.WriteLine($"{category.CategoryName} - {category.Description}");
@@ -285,9 +330,11 @@ namespace NorthwindConsole
         public static void displayAllCategoriesAndProducts() {
             var db = new NorthwindContext();
             var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
+
             foreach (var item in query)
             {
                 Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+
                 foreach (Product p in item.Products)
                 {
                     Console.WriteLine($"\t{p.ProductID}) {p.ProductName}");
@@ -297,8 +344,10 @@ namespace NorthwindConsole
 
         public static void displayAllProducts() {
             string response;
+
             var db = new NorthwindContext();
             var query = db.Products.OrderBy(p => p.ProductID);
+
             do
             {
                 Console.ForegroundColor = ConsoleColor.White; // relatively neutral color to represent both active and discontinued as an option
@@ -313,17 +362,21 @@ namespace NorthwindConsole
                 Console.ForegroundColor = ConsoleColor.Cyan;
 
                 response = Console.ReadLine();
+
             } while (response != "1" && response != "2" && response != "3");
 
             switch (response) {
                 case "1": // all products by name
                     var allProducts = db.Products.OrderBy(p => p.ProductID);
+
+                    // format informational header for color coding
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("Active");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write(" | ");
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Discontinued\n\n");
+
                     foreach (var item in allProducts) {
                         if (item.Discontinued)
                         {
@@ -338,6 +391,7 @@ namespace NorthwindConsole
                     break;
                 case "2": // all active products by name
                     var activeProducts = db.Products.OrderBy(p => p.ProductID).Where(p => p.Discontinued == false);
+
                     foreach (var item in activeProducts)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -346,6 +400,7 @@ namespace NorthwindConsole
                     break;
                 case "3": // all discontinued products by name
                     var discontinuedProducts = db.Products.OrderBy(p => p.ProductID).Where(p => p.Discontinued == true);
+
                     foreach (var item in discontinuedProducts)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
